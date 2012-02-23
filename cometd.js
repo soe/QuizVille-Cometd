@@ -11,7 +11,16 @@ var url     = require('url'),
 
 // fayeServer - a Bayeux server - is mounted at /cometd
 var fayeServer = new faye.NodeAdapter({mount: '/cometd', timeout: 60 });
-fayeServer.listen(config.PORT);
+
+// Handle non-Bayeux requests
+var server = http.createServer(function(request, response) {
+  response.writeHead(200, {'Content-Type': 'text/plain'});
+  response.write('Welcome to QuizVille Cometd server. It is mounted at /cometd.');
+  response.end();
+});
+
+fayeServer.attach(server);
+server.listen(config.PORT);
 
 // get Salesforce OAuth Token for access to APIs
 function getOAuthToken(callback) {
