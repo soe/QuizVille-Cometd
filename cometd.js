@@ -3,11 +3,13 @@ var config = require('./config.js');
 
 // include required node modules
 var url     = require('url'),
+    http    = require('http'),
     https   = require('https'),
+    request = require('request'),
     // a customized faye module for Salesforce
     // an addition of single line in faye-node.js at line 2805
-    faye    = require('./faye'), 
-    request = require('request');
+    faye    = require('./faye');
+    
 
 // fayeServer - a Bayeux server - is mounted at /cometd
 var fayeServer = new faye.NodeAdapter({mount: '/cometd', timeout: 60 });
