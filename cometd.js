@@ -10,7 +10,8 @@ var url     = require('url'),
     request = require('request');
 
 // fayeServer - a Bayeux server - is mounted at /cometd
-var fayeServer    = new faye.NodeAdapter({mount: '/cometd', timeout: 60, port: config.PORT});
+var fayeServer = new faye.NodeAdapter({mount: '/cometd', timeout: 60 });
+fayeServer.listen(config.PORT);
 
 // get Salesforce OAuth Token for access to APIs
 function getOAuthToken(callback) {
