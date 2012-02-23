@@ -81,9 +81,9 @@ getOAuthToken(function(oauth) {
   var upstreamSub = upstreamClient.subscribe(config.PUSH_TOPIC, function(message) {
     if(config.DEBUG) console.log("Received upstream message: " + JSON.stringify(message));
     
-    // publish back to downstream - organized by Quick_Quiz__c.Name
-    if(config.DEBUG) console.log('Publishing to /q/'+ message.sobject.Id);
-    downstreamClient.publish('/q/'+ message.sobject.Id, message);    
+    // publish back to downstream - organized by Quick_Quiz__c
+    if(config.DEBUG) console.log('Publishing to /q/'+ message.sobject.Quick_Quiz__c);
+    downstreamClient.publish('/q/'+ message.sobject.Quick_Quiz__c, message);    
   });
   
   upstreamSub.callback(function() {
