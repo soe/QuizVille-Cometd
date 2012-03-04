@@ -49,7 +49,6 @@ function getOAuthToken(callback) {
 
 // Get an OAuth token - and wait for callback
 getOAuthToken(function(oauth) {
-  var oauth = getOAuthToken();
   if(config.DEBUG) console.log('Got token '+ oauth.access_token);
 
   // upstream cometd endpoint
