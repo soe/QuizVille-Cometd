@@ -7,5 +7,5 @@ exports.CLIENT_ID = '3MVG9rFJvQRVOvk4cxTJa7DLkKTD8NuAg5AexmhUWE.Yv.W4.WgDugtPKYc
 exports.CLIENT_SECRET = '4614924466188346354';
 
 exports.USERNAME = 'soe@soe.im.streamingapi';
-exports.PASSWORD = 'FORCE2012@@jSbIygQ9XKPulmIeEYPPI2lDl'
+exports.PASSWORD = 'FORCE12@@TAFkjaBQg9y00e52SamhCCxfG'
 exports.PUSH_TOPIC = '/topic/Quiz_Answers';
