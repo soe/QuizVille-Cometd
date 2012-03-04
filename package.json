@@ -5,7 +5,7 @@
   "engine": "node >= 0.6.11",
   "dependencies": {
 	  "request": ">= 2.0.0",
-	  "faye": ">= 0.7.1",
+	  "faye": ">= 0.8",
 	  "cookiejar": ""
   }
 }
