@@ -40,68 +40,72 @@ function getOAuthToken(callback) {
       body: token_request
   }, function (error, response, body) {
 		if ( response.statusCode == 200 ) {
-	    return JSON.parse(body);
+	    callback(JSON.parse(body));
 		} else {
 		  if(config.DEBUG) console.log('Error '+response.statusCode+' '+body+' '+error);
 		}
   });	
 }
 
-// Get an OAuth token
-var oauth = getOAuthToken();
-if(config.DEBUG) console.log('Got token '+ oauth.access_token);
+// Get an OAuth token - and wait for callback
+getOAuthToken(function(oauth) {
+  var oauth = getOAuthToken();
+  if(config.DEBUG) console.log('Got token '+ oauth.access_token);
 
-// upstream cometd endpoint
-var salesforce_endpoint = oauth.instance_url +'/cometd/24.0';
+  // upstream cometd endpoint
+  var salesforce_endpoint = oauth.instance_url +'/cometd/24.0';
 
-if(config.DEBUG) console.log("Creating a client for "+ salesforce_endpoint);
-var upstreamClient = new faye.Client(salesforce_endpoint);
+  if(config.DEBUG) console.log("Creating a client for "+ salesforce_endpoint);
+  var upstreamClient = new faye.Client(salesforce_endpoint);
 
-// set Authorization header
-upstreamClient.headers = { 'Authorization': 'OAuth '+ oauth.access_token };
+  // set Authorization header
+  upstreamClient.headers = { 'Authorization': 'OAuth '+ oauth.access_token };
 
-// monitor connection down and reconnect again
-upstreamClient.bind('transport:down', function(this) {
-  // get an OAuth token again
-  oauth = getOAuthToken();
-  
-  // set new Authorization header
-  this.headers = { 'Authorization': 'OAuth '+ oauth.access_token };
-});
+  // monitor connection down and reconnect again
+  /*
+  upstreamClient.bind('transport:down', function(this) {
+    // get an OAuth token again
+    getOAuthToken(function(oauth) {
+      // set new Authorization header
+      this.headers = { 'Authorization': 'OAuth '+ oauth.access_token };
+    });
+  });
+  */
 
-// just for debugging I/O, an extension to upstreamClient
-upstreamClient.addExtension({
-  outgoing: function(message, callback) {   
-    if(config.DEBUG) console.log('OUT >>> '+ JSON.stringify(message));
+  // just for debugging I/O, an extension to upstreamClient
+  upstreamClient.addExtension({
+    outgoing: function(message, callback) {   
+      if(config.DEBUG) console.log('OUT >>> '+ JSON.stringify(message));
     
-    callback(message);            
-  },
-  incoming: function(message, callback) {   
-    if(config.DEBUG) console.log('IN >>>> '+ JSON.stringify(message));
+      callback(message);            
+    },
+    incoming: function(message, callback) {   
+      if(config.DEBUG) console.log('IN >>>> '+ JSON.stringify(message));
     
-    callback(message);            
-  }            
-});
+      callback(message);            
+    }            
+  });
 
-// start downstreamClient to publish messages
-var downstreamClient = fayeServer.getClient();
+  // start downstreamClient to publish messages
+  var downstreamClient = fayeServer.getClient();
 
-// subscribe to salesforce push topic
-if(config.DEBUG) console.log('Subscribing to '+ config.PUSH_TOPIC);
-var upstreamSub = upstreamClient.subscribe(config.PUSH_TOPIC, function(message) {
-  if(config.DEBUG) console.log("Received upstream message: " + JSON.stringify(message));
+  // subscribe to salesforce push topic
+  if(config.DEBUG) console.log('Subscribing to '+ config.PUSH_TOPIC);
+  var upstreamSub = upstreamClient.subscribe(config.PUSH_TOPIC, function(message) {
+    if(config.DEBUG) console.log("Received upstream message: " + JSON.stringify(message));
   
-  // publish back to downstream - organized by Quick_Quiz__c
-  if(config.DEBUG) console.log('Publishing to /q/'+ message.sobject.Quick_Quiz__c);
-  downstreamClient.publish('/q/'+ message.sobject.Quick_Quiz__c, message);    
-});
+    // publish back to downstream - organized by Quick_Quiz__c
+    if(config.DEBUG) console.log('Publishing to /q/'+ message.sobject.Quick_Quiz__c);
+    downstreamClient.publish('/q/'+ message.sobject.Quick_Quiz__c, message);    
+  });
 
-// log that upstream subscription is active
-upstreamSub.callback(function() {
-  if(config.DEBUG) console.log('Upstream subscription is now active');    
-});
+  // log that upstream subscription is active
+  upstreamSub.callback(function() {
+    if(config.DEBUG) console.log('Upstream subscription is now active');    
+  });
 
-// log that upstream subscription encounters error
-upstreamSub.errback(function(error) {
-  if(config.DEBUG) console.error("ERROR ON Upstream subscription Attempt: " + error.message);
-});  
+  // log that upstream subscription encounters error
+  upstreamSub.errback(function(error) {
+    if(config.DEBUG) console.error("ERROR ON Upstream subscription Attempt: " + error.message);
+  });
+});
