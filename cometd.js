@@ -58,15 +58,15 @@ getOAuthToken(function(oauth) {
   var upstreamClient = new faye.Client(salesforce_endpoint);
 
   // set Authorization header
-  upstreamClient.headers = { 'Authorization': 'OAuth '+ oauth.access_token };
+  upstreamClient.setHeader('Authorization', 'OAuth '+ oauth.access_token);
 
   // monitor connection down and reconnect again
   /*
-  upstreamClient.bind('transport:down', function(this) {
+  upstreamClient.bind('transport:down', function(upstreamClient) {
     // get an OAuth token again
     getOAuthToken(function(oauth) {
       // set new Authorization header
-      this.headers = { 'Authorization': 'OAuth '+ oauth.access_token };
+      upstreamClient.setHeader('Authorization', 'OAuth '+ oauth.access_token);
     });
   });
   */
