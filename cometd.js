@@ -6,8 +6,6 @@ var url     = require('url'),
     http    = require('http'),
     https   = require('https'),
     request = require('request'),
-    // a customized faye module for Salesforce
-    // an addition of single line in faye-node.js at line 2805
     faye    = require('faye');
     
 
@@ -60,8 +58,7 @@ getOAuthToken(function(oauth) {
   // set Authorization header
   upstreamClient.setHeader('Authorization', 'OAuth '+ oauth.access_token);
 
-  // monitor connection down and reconnect again
-  /*
+  // monitor connection down and reset the Authorization header
   upstreamClient.bind('transport:down', function(upstreamClient) {
     // get an OAuth token again
     getOAuthToken(function(oauth) {
@@ -69,7 +66,6 @@ getOAuthToken(function(oauth) {
       upstreamClient.setHeader('Authorization', 'OAuth '+ oauth.access_token);
     });
   });
-  */
 
   // just for debugging I/O, an extension to upstreamClient
   upstreamClient.addExtension({
